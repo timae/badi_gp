@@ -14,17 +14,32 @@ type BathInfo struct {
 }
 
 type Bath struct {
-	Title  string `xml:"title"`
-	Poiid  string `xml:"poiid"`
+	Title string `xml:"title"`
+	Poiid string `xml:"poiid"`
 	// Add more fields if needed
 }
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Read XML data from the URL
-		xmlData, err := readXML("https://www.stadt-zuerich.ch/stzh/bathdatadownload")
+		// Fetch XML data from the URL
+		resp, err := http.Get("https://www.stadt-zuerich.ch/stzh/bathdatadownload")
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to fetch XML data: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Failed to fetch data: %v", err), http.StatusInternalServerError)
+			return
+		}
+		defer resp.Body.Close()
+
+		// Check content type
+		contentType := resp.Header.Get("Content-Type")
+		if contentType != "text/xml" {
+			http.Error(w, fmt.Sprintf("Unexpected content type: %s", contentType), http.StatusInternalServerError)
+			return
+		}
+
+		// Read XML data
+		xmlData, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to read data: %v", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -32,7 +47,7 @@ func main() {
 		bathInfo := BathInfo{}
 		err = xml.Unmarshal(xmlData, &bathInfo)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to parse XML data: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Failed to parse data: %v", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -78,15 +93,4 @@ func main() {
 	})
 
 	http.ListenAndServe(":8080", nil)
-}
-
-// Function to read XML data from URL
-func readXML(url string) ([]byte, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	return ioutil.ReadAll(resp.Body)
 }
