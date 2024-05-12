@@ -24,7 +24,7 @@ func main() {
 		// Read XML data from the URL
 		xmlData, err := readXML("https://www.stadt-zuerich.ch/stzh/bathdatadownload")
 		if err != nil {
-			http.Error(w, "Failed to fetch XML data", http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Failed to fetch XML data: %v", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -32,7 +32,7 @@ func main() {
 		bathInfo := BathInfo{}
 		err = xml.Unmarshal(xmlData, &bathInfo)
 		if err != nil {
-			http.Error(w, "Failed to parse XML data", http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Failed to parse XML data: %v", err), http.StatusInternalServerError)
 			return
 		}
 
