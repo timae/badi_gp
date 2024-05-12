@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // Define struct to represent the XML data structure
@@ -31,7 +32,7 @@ func main() {
 
 		// Check content type
 		contentType := resp.Header.Get("Content-Type")
-		if contentType != "text/xml" {
+		if !strings.HasPrefix(contentType, "text/xml") {
 			http.Error(w, fmt.Sprintf("Unexpected content type: %s", contentType), http.StatusInternalServerError)
 			return
 		}
