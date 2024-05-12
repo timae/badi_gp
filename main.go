@@ -24,7 +24,7 @@ func main() {
     // Define a handler function
     handler := func(w http.ResponseWriter, r *http.Request) {
         // Fetch data from XML API
-        resp, err := http.Get("https://www.stadt-zuerich.ch/stzh/bathdatadownload")
+        resp, err := http.Get("https://data.stadt-zuerich.ch/dataset/wassertemperaturen-freibaeder/resource/548d1ceb-1daf-4cf9-a14a-92c86326824d")
         if err != nil {
             http.Error(w, "Failed to fetch data", http.StatusInternalServerError)
             return
