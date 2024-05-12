@@ -39,11 +39,13 @@ func main() {
         }
 
         // Parse XML
+       // Parse XML
         var data FlussbadData
         if err := xml.Unmarshal(body, &data); err != nil {
-            http.Error(w, "Failed to parse XML", http.StatusInternalServerError)
+            http.Error(w, fmt.Sprintf("Failed to parse XML: %v", err), http.StatusInternalServerError)
             return
         }
+
 
         // Display data in the response
         for _, flussbad := range data.Flussbads {
